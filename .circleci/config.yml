@@ -255,7 +255,7 @@ jobs:
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          ID: ${CIRCLE_WORKFLOW_ID:0:7}
       #    when: on_fail
  
   deploy-frontend:
