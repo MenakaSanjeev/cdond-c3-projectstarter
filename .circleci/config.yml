@@ -234,18 +234,36 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-      - run:
-          name: Run migrations
+      #- run:
+      #    name: Run migrations
           #working_directory: ./backend
+      #    command: |
+      #      cd backend
+      #      npm install
+      #      npm run migrations > migration_dump.txt
+      #- run:
+      #    name: Send migration results to memstash
+      #    working_directory: ./backend
+      #    command: |
+      #      if grep -q "has been executed successfully" migration_dump.txt
+      #      then
+      #        echo "DB migration was successful, will update memstash..."
+      #        curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "success" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
+      #      else
+      #        echo "DB migration failed, please verify setup! Probably the database already exists. Verify setup!"
+      #        curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
+      #      fi
+      #      echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
+       - run:
+          name: Run migrations
+          working_directory: ./backend
           command: |
-            cd backend
-            npm install
-            npm run migrations > migration_dump.txt
+            npm run migrations > migration_status
       - run:
           name: Send migration results to memstash
           working_directory: ./backend
           command: |
-            if grep -q "has been executed successfully" migration_dump.txt
+            if grep -q "has been executed successfully" migration_status
             then
               echo "DB migration was successful, will update memstash..."
               curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "success" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
