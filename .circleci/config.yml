@@ -254,7 +254,7 @@ jobs:
       #        curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
       #      fi
       #      echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
-       - run:
+      - run:
           name: Run migrations
           working_directory: ./backend
           command: |
