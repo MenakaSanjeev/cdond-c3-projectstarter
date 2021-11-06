@@ -351,7 +351,7 @@ jobs:
             aws --version
       - run:
           name: Deploy backend
-          working_directory: .circleci/ansible
+          working_directory: .circleci
           command: |
             cd backend
             npm i
