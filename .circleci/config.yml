@@ -282,7 +282,7 @@ jobs:
     docker:
       #- image: circleci/node:13.8.0
       # Docker image here that supports AWS CLI
-      - image: python:3.9.0-alpine 
+      - image: amazon/aws-cli 
     steps:
       - checkout
       - attach_workspace:
@@ -290,6 +290,12 @@ jobs:
       #- run:
       #    name: Add tar
       #    command: yum install -y tar
+      - run: 
+          name: Install tar and gzip
+          command: | 
+            apt update
+            apt install tar
+            apt install gzip
       - run:
           name: Install dependencies
           command: |
