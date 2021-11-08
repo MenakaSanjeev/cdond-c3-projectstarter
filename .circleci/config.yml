@@ -280,15 +280,16 @@ jobs:
  
   deploy-frontend:
     docker:
+      - image: circleci/node:13.8.0
       # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli 
+      #- image: amazon/aws-cli 
     steps:
       - checkout
       - attach_workspace:
           at: .
-    #  - run:
-    #      name: Add tar
-    #      command: yum install -y tar
+      - run:
+          name: Add tar
+          command: yum install -y tar
       - run:
           name: Install AWS CLI dependencies
           working_directory: /tmp
