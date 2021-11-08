@@ -282,7 +282,7 @@ jobs:
     docker:
       #- image: circleci/node:13.8.0
       # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli 
+      - image: python:3.9.0-alpine 
     steps:
       - checkout
       - attach_workspace:
