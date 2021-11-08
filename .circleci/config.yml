@@ -292,19 +292,14 @@ jobs:
       #    command: yum install -y tar
       - run:
           name: Install dependencies
-       #   working_directory: /tmp
           command: |
-          #  sudo apt-get update && sudo apt-get install -yy less
-          #  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          #  unzip awscliv2.zip
-          #  sudo ./aws/install
-           yum install -y curl tar sudo
-           curl -sL https://rpm.nodesource.com/setup_13.x | sudo bash -
-           yum install -y nodejs
-           node --version 
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install 
       - run:
           name: Rebuild frontend with backend API Url
-         # working_directory: ./frontend
+          working_directory: ./frontend
           command: |
            # export API_URL=$(curl -H "token: 1e288415-cfc8-4a0a-a23c-087eb7cd7678" --request GET https://api.memstash.io/values/BACKEND_URL)
            # export API_URL=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/BACKEND_URL)
@@ -459,16 +454,16 @@ workflows:
             branches:
               only:
                 - master
-      - deploy-backend:
-          requires:
-            - run-migrations
+      #- deploy-backend:
+      #    requires:
+      #      - run-migrations
       - deploy-frontend:
           requires:
             - run-migrations
-      - smoke-test:
-          requires:
-            - deploy-backend
-            - deploy-frontend
+      #- smoke-test:
+      #    requires:
+      #      - deploy-backend
+      #      - deploy-frontend
 
   #send-notification:
   #  jobs:
