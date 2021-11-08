@@ -286,9 +286,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run:
-          name: Add tar
-          command: yum install -y tar
+    #  - run:
+    #      name: Add tar
+    #      command: yum install -y tar
       - run:
           name: Install AWS CLI dependencies
           working_directory: /tmp
@@ -299,18 +299,18 @@ jobs:
             sudo ./aws/install
       - run:
           name: Rebuild frontend with backend API Url
-          working_directory: ./frontend
+         # working_directory: ./frontend
           command: |
            # export API_URL=$(curl -H "token: 1e288415-cfc8-4a0a-a23c-087eb7cd7678" --request GET https://api.memstash.io/values/BACKEND_URL)
-            export API_URL=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/BACKEND_URL)
-            echo "${API_URL}"
-            npm run build
+           # export API_URL=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/BACKEND_URL)
+           # echo "${API_URL}"
+           # npm run build
           
-         # export BACKEND_IP=$(aws ec2 describe-instances...............)
-         # export API_URL="http://${BACKEND_IP}:3030"
-         # echo "API_URL = ${API_URL}"
-         # echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-         # cat frontend/.env
+          export BACKEND_IP=$(aws ec2 describe-instances...............)
+          export API_URL="http://${BACKEND_IP}:3030"
+          echo "API_URL = ${API_URL}"
+          echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+          cat frontend/.env
       - run:
           name: Deploy frontend objects to S3
           working_directory: ./frontend
