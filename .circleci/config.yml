@@ -290,12 +290,12 @@ jobs:
       #- run:
       #    name: Add tar
       #    command: yum install -y tar
-      - run: 
-          name: Install tar and gzip
-          command: | 
-            apt update
-            apt install tar
-            apt install gzip
+      - run:
+          name: Add tar
+          command: yum install -y tar
+      - run:
+          name: Add gzip
+          command: yum install -y gzip
       - run:
           name: Install dependencies
           command: |
