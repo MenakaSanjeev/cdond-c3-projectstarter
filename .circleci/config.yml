@@ -290,12 +290,7 @@ jobs:
       #- run:
       #    name: Add tar
       #    command: yum install -y tar
-      - run:
-          name: Add tar
-          command: yum install -y tar
-      - run:
-          name: Add gzip
-          command: yum install -y gzip
+
       - run:
           name: Install dependencies
           command: |
@@ -326,6 +321,12 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
           # aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+      - run:
+          name: Add tar
+          command: yum install -y tar
+      - run:
+          name: Add gzip
+          command: yum install -y gzip
       - persist_to_workspace:
           root: .
           paths:
