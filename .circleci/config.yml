@@ -283,88 +283,124 @@ jobs:
       #- destroy_environment:
       #    ID: ${CIRCLE_WORKFLOW_ID:0:7}
       #    when: on_fail
- 
   deploy-frontend:
     docker:
-      #- image: circleci/node:13.8.0
       # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli 
+      - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
-      - attach_workspace:
-          at: .
-      #- run:
-      #    name: Add tar
-      #    command: yum install -y tar
-      
-     # - run:
-     #     name: Install tar/gzip utility
-     #     command: |
-     #      yum -y install tar
-     #      yum -y install gzip
-
       - run:
-          name: Install dependencies
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install 
+          name: update
+          command: |  
+            sudo apt update && sudo apt upgrade            
+            sudo apt install curl
       - run:
-          name: Rebuild frontend with backend API Url
-          working_directory: ./frontend
-          command: |
-#            export API_URL=$(curl -H "token: 1e288415-cfc8-4a0a-a23c-087eb7cd7678" --request GET https://api.memstash.io/values/BACKEND_URL)
-#           # export API_URL=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/BACKEND_URL)
-#           # echo "${API_URL}"
-#           # npm run build
-#           export BACKEND_IP=$(aws ec2 describe-instances...............)
-#           export API_URL="http://${BACKEND_IP}:3030"
-#           echo "API_URL = ${API_URL}"
-#           echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-#           cat frontend/.env
-#      - run:
-#          name: Deploy frontend objects to S3
-#          working_directory: ./frontend
-#          command: |
-#            cd frontend
-#            npm install
-#            yum -y install tar
-#            yum -y install gzip
-#            npm run build
-#            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-#            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-          # aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
-#      - run:
-#          name: Add tar
-#          command: yum install -y tar
-#      - run:
-#          name: Add gzip
-#          command: yum install -y gzip
-
+          name: Install aws
+          command: |                        
+            sudo apt-get install python python-pip
+            sudo pip install awscli
+            aws --version
       - run:
-          name: Rebuild frontend with backend API Url
-          working_directory: ./frontend
+          name: Get backend url
           command: |
-            export API_URL=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/BACKEND_URL)
+            # your code here
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].PublicIpAddress' --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} --output text) 
+            export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            npm run build
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+            
       - run:
-          name: Deploy frontend objects to S3
-          working_directory: ./frontend
+          name: Deploy frontend objects
           command: |
-            aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive    
-      - persist_to_workspace:
-          root: .
-          paths:
-            - frontend/dist
-      #- destroy_environment:
-      #    ID: ${CIRCLE_WORKFLOW_ID:0:7}
-          #when: on_fail
-      #- revert_migrations:
-      #    ID: ${CIRCLE_WORKFLOW_ID:0:7}
-          #when: on_fail
+            # your code here
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure  
+    #  - revert-migrations:
+    #      event: on_fail
+    #  - destroy-environment:
+    #      event: on_fail
+      - run:
+          name: Build Success
+          when: on_success
+          command: |
+            curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "1" https://api.memstash.io/values/frontend_${CIRCLE_WORKFLOW_ID:0:7}
 
+deploy-backend:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      # Add ssh keys with fingerprint
+      # attach workspace
+        - checkout
+        - add_ssh_keys:
+            fingerprints: ["19:57:a1:a2:5c:d0:ac:07:6b:54:cd:5b:e3:ac:7a:14"] 
+        - attach_workspace:
+            at: ~/
+        #- update-and-install-dependencies   
+        - run:
+            name: Install dependencies
+            command: |
+              # Your code here
+              apk update
+              apk upgrade
+              apk add unzip 
+              apk add curl
+              /usr/local/bin/python -m pip install --upgrade pip    
+        - run:
+            name: Install node
+            command: |
+              apk add --update nodejs nodejs-npm
+              node --version
+              npm --version
+        - run:
+            name: Install ansible
+            command: |
+              # your code here              
+              apk add --update ansible 
+              ansible --version
+        - run:
+            name: Install aws
+            command: |
+              # your code here              
+              # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              # unzip awscliv2.zip
+              # ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
+              # aws --version        
+              pip install awscli --upgrade   
+              aws --version       
+        - run:
+            name: Deploy backend
+            command: |
+              # your code here
+              echo "cd backend -------"
+              cd backend
+              echo "npm install -------"
+              npm i
+              npm run build
+              cd ..
+              # Zip the directory
+              echo "zip the directory -------"
+              tar -C backend -czvf artifact.tar.gz .
+              echo "mv artifac to ansibble -------"
+              mv artifact.tar.gz .circleci/ansible/
+              cd .circleci/ansible
+              echo "Contents  of the inventory.txt file is -------"
+              cat inventory.txt
+              ansible-playbook -i inventory.txt deploy-backend.yml
+      # Here's where you will add some code to rollback on failure  
+        - revert-migrations:
+            event: on_fail
+            
+        - destroy-environment:
+            event: on_fail
   #deploy-backend:
   #  docker:
   #    - image: python:3.9.0-alpine
