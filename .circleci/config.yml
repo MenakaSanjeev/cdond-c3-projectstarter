@@ -21,7 +21,7 @@ commands:
   #          aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.ID >>
   #          aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.ID >>
 
-destroy-environment:
+  destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks and S3 bucket given a workflow ID.   
     parameters:
       event:
@@ -244,8 +244,9 @@ jobs:
           root: .
           paths:
             - .circleci/ansible/inventory.txt
-      - destroy_environment:
-          event: on_fail 
+      - destroy-environment:
+          event: on_fail  
+
 
   configure-infrastructure:
     docker:
@@ -270,8 +271,8 @@ jobs:
             ls -la
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy_environment:
-          event: on_fail
+      - destroy-environment:
+            event: on_fail
 
   run-migrations:
     docker:
@@ -328,8 +329,8 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy_environment:
-          event: on_fail
+      - destroy-environment:
+            event: on_fail
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
@@ -531,11 +532,10 @@ jobs:
             else
               return 1
             fi
-      
-      - destroy_environment:
-          event: on_fail
-      - revert_migrations:
-          event: on_fail
+      - destroy-environment:
+            event: on_fail
+      - revert-migrations:
+            event: on_fail
                  
  # notify:
  #   docker:
