@@ -271,8 +271,8 @@ jobs:
             ls -la
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment:
-            event: on_fail
+     # - destroy-environment:
+     #       event: on_fail
 
   run-migrations:
     docker:
@@ -329,8 +329,8 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy-environment:
-            event: on_fail
+      #- destroy-environment:
+      #      event: on_fail
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
@@ -354,6 +354,7 @@ jobs:
           command: |
             # your code here
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].PublicIpAddress' --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} --output text) 
+            echo "BACKEND_IP"
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -498,8 +499,24 @@ jobs:
           name: Install dependencies
           working_directory: /tmp
           command: |
-            apk add --update curl nodejs npm
-            pip install awscli
+            #apk add --update curl nodejs npm
+            #pip install awscli
+            apk update
+            apk upgrade
+            apk add unzip 
+            apk add curl
+            /usr/local/bin/python -m pip install --upgrade pip    
+      - run:
+          name: Install node
+          command: |
+            apk add --update nodejs nodejs-npm
+            node --version
+            npm --version
+      - run:
+          name: Install aws
+          command: |    
+            pip install awscli --upgrade   
+            aws --version 
       - run:
           name: Backend smoke test.
           working_directory: ./backend
@@ -512,6 +529,7 @@ jobs:
             #export API_URL="http://${BACKEND_IP}:3030"
 
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].PublicIpAddress' --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} --output text) 
+            echo "BACKEND_IP"
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
 
