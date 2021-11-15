@@ -330,7 +330,7 @@ jobs:
           when: on_success
           command: |
             curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "1" https://api.memstash.io/values/frontend_${CIRCLE_WORKFLOW_ID:0:7}
-deploy-backend:
+  deploy-backend:
     docker:
       # Docker image here that supports Ansible
       - image: python:3.7-alpine3.11
@@ -338,68 +338,68 @@ deploy-backend:
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
-        - checkout
-        - add_ssh_keys:
-            fingerprints: ["19:57:a1:a2:5c:d0:ac:07:6b:54:cd:5b:e3:ac:7a:14"] 
-        - attach_workspace:
-            at: ~/
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["19:57:a1:a2:5c:d0:ac:07:6b:54:cd:5b:e3:ac:7a:14"] 
+      - attach_workspace:
+          at: ~/
         #- update-and-install-dependencies   
-        - run:
-            name: Install dependencies
-            command: |
-              # Your code here
-              apk update
-              apk upgrade
-              apk add unzip 
-              apk add curl
-              /usr/local/bin/python -m pip install --upgrade pip    
-        - run:
-            name: Install node
-            command: |
-              apk add --update nodejs nodejs-npm
-              node --version
-              npm --version
-        - run:
-            name: Install ansible
-            command: |
-              # your code here              
-              apk add --update ansible 
-              ansible --version
-        - run:
-            name: Install aws
-            command: |
-              # your code here              
-              # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              # unzip awscliv2.zip
-              # ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
-              # aws --version        
-              pip install awscli --upgrade   
-              aws --version       
-        - run:
-            name: Deploy backend
-            command: |
-              # your code here
-              echo "cd backend -------"
-              cd backend
-              echo "npm install -------"
-              npm i
-              npm run build
-              cd ..
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            apk update
+            apk upgrade
+            apk add unzip 
+            apk add curl
+            /usr/local/bin/python -m pip install --upgrade pip    
+      - run:
+          name: Install node
+          command: |
+            apk add --update nodejs nodejs-npm
+            node --version
+            npm --version
+      - run:
+          name: Install ansible
+          command: |
+            # your code here              
+            apk add --update ansible 
+            ansible --version
+      - run:
+          name: Install aws
+          command: |
+            # your code here              
+            # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            # unzip awscliv2.zip
+            # ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
+            # aws --version        
+            pip install awscli --upgrade   
+            aws --version       
+      - run:
+          name: Deploy backend
+          command: |
+            # your code here
+            echo "cd backend -------"
+            cd backend
+            echo "npm install -------"
+            npm i
+            npm run build
+            cd ..
               # Zip the directory
-              echo "zip the directory -------"
-              tar -C backend -czvf artifact.tar.gz .
-              echo "mv artifac to ansibble -------"
-              mv artifact.tar.gz .circleci/ansible/
-              cd .circleci/ansible
-              echo "Contents  of the inventory.txt file is -------"
-              cat inventory.txt
-              ansible-playbook -i inventory.txt deploy-backend.yml
+            echo "zip the directory -------"
+            tar -C backend -czvf artifact.tar.gz .
+            echo "mv artifac to ansible -------"
+            mv artifact.tar.gz .circleci/ansible/
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
-        - revert-migrations:
-            event: on_fail
+      #- revert-migrations:
+      #    event: on_fail
             
-        - destroy-environment:
-            event: on_fail
+      #- destroy-environment:
+      #    event: on_fail
   #deploy-backend:
   #  docker:
   #    - image: python:3.9.0-alpine
