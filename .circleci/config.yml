@@ -21,6 +21,56 @@ commands:
   #          aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.ID >>
   #          aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.ID >>
 
+destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks and S3 bucket given a workflow ID.   
+    parameters:
+      event:
+        type: string
+     # workflow_id:
+     #   type: string 
+    steps:
+      - run:
+          name: Destroy environments
+          when: << parameters.event >>
+          command: |
+            # Your code here                        
+            # aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            
+            FRONTEND=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/frontend_${CIRCLE_WORKFLOW_ID:0:7})
+            if [[ $FRONTEND == 1 ]];
+            then
+              echo "delete s3 'udapeople-${CIRCLE_WORKFLOW_ID:0:7}' content"
+              aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            fi
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.  
+    parameters:
+      event:
+        type: string
+     # workflow_id:
+     #   type: string 
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          when: << parameters.event >>
+          command: |
+            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable            
+            echo "Revert migrations started..."
+            SUCCESS=$(curl -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            if [[ $SUCCESS == 1 ]];
+            then
+              echo "roll back migration started"
+              cd ~/project/backend
+              npm install
+              npm run migrations:revert
+              echo "roll back migration completed"
+            fi
+             echo "Revert migrations finish..."
+
 jobs:
   build-frontend:
     docker:
@@ -194,9 +244,8 @@ jobs:
           root: .
           paths:
             - .circleci/ansible/inventory.txt
-      #- destroy_environment:
-      #    ID: ${CIRCLE_WORKFLOW_ID:0:7}
-          #when: on_fail 
+      - destroy_environment:
+          event: on_fail 
 
   configure-infrastructure:
     docker:
@@ -221,9 +270,8 @@ jobs:
             ls -la
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      #- destroy_environment:
-       #   ID: ${CIRCLE_WORKFLOW_ID:0:7}
-          #when: on_fail
+      - destroy_environment:
+          event: on_fail
 
   run-migrations:
     docker:
@@ -280,9 +328,8 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: 4d6c61e0-e2a1-4cf9-b762-9c7298c3c588" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7}
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
-      #- destroy_environment:
-      #    ID: ${CIRCLE_WORKFLOW_ID:0:7}
-      #    when: on_fail
+      - destroy_environment:
+          event: on_fail
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
@@ -396,11 +443,11 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
-      #- revert-migrations:
-      #    event: on_fail
+      - revert-migrations:
+          event: on_fail
             
-      #- destroy-environment:
-      #    event: on_fail
+      - destroy-environment:
+          event: on_fail
   #deploy-backend:
   #  docker:
   #    - image: python:3.9.0-alpine
@@ -484,12 +531,11 @@ jobs:
             else
               return 1
             fi
-     # - destroy_environment:
-     #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-     #     when: on_fail
-     # - revert_migrations:
-     #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-     #     when: on_fail
+      
+      - destroy_environment:
+          event: on_fail
+      - revert_migrations:
+          event: on_fail
                  
  # notify:
  #   docker:
