@@ -385,10 +385,17 @@ jobs:
             npm i
             npm run build
             cd ..
+<<<<<<< HEAD
             # Zip the directory
             echo "zip the directory -------"
             tar -C backend -czvf artifact.tar.gz .
             echo "mv artifac to ansibble -------"
+=======
+              # Zip the directory
+            echo "zip the directory -------"
+            tar -C backend -czvf artifact.tar.gz .
+            echo "mv artifac to ansible -------"
+>>>>>>> ea90d805e0f1338412740daf84cf7c8ec1e54567
             mv artifact.tar.gz .circleci/ansible/
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
