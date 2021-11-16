@@ -205,7 +205,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["19:57:a1:a2:5c:d0:ac:07:6b:54:cd:5b:e3:ac:7a:14"]
+          fingerprints: ["b3:fe:1b:46:cf:8c:db:4f:c6:d0:50:a7:73:00:f7:2d"]
       - attach_workspace:
           at: .
       - run:
@@ -340,7 +340,7 @@ jobs:
       # attach workspace
       - checkout
       - add_ssh_keys:
-         fingerprints: ["19:57:a1:a2:5c:d0:ac:07:6b:54:cd:5b:e3:ac:7a:14"] 
+         fingerprints: ["b3:fe:1b:46:cf:8c:db:4f:c6:d0:50:a7:73:00:f7:2d"] 
       - attach_workspace:
          at: ~/
         #- update-and-install-dependencies   
