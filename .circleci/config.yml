@@ -388,7 +388,7 @@ jobs:
             # Zip the directory
             echo "zip the directory -------"
             tar -C backend -czvf artifact.tar.gz .
-            echo "mv artifac to ansibble -------"
+            echo "mv artifact to ansible -------"
             mv artifact.tar.gz .circleci/ansible/
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
