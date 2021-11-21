@@ -342,7 +342,7 @@ jobs:
       - add_ssh_keys:
          fingerprints: ["b3:fe:1b:46:cf:8c:db:4f:c6:d0:50:a7:73:00:f7:2d"] 
       - attach_workspace:
-         at: ~/
+         at: .
         #- update-and-install-dependencies
       - run:
           name: Install dependencies
@@ -369,10 +369,10 @@ jobs:
             npm run prestart:prod
             cd ..
             echo "Contents  of the inventory.txt file is -------"
-            cat ~/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
             tar -cvf backend.tar backend
             cp backend.tar ~/backend.tar
-            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ~/ansible/inventory.txt .circleci/ansible/deploy-backend.yml   
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml   
       #- run:
       #    name: Install dependencies
       #    command: |
