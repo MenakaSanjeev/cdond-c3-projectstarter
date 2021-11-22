@@ -406,8 +406,11 @@ jobs:
             cd ..
             echo "Contents  of the inventory.txt file is -------"
             cat .circleci/ansible/inventory.txt
+            echo "Cat inventory text file -------"
             tar -cvf backend.tar backend
+            echo "tarbal -------"
             cp backend.tar ~/backend.tar
+            echo "copy backend -------"
             ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml   
       #- run:
       #    name: Install dependencies
