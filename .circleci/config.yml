@@ -353,6 +353,7 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
+            echo "APK update" 
             apk update
             apk upgrade
             apk add unzip
@@ -361,12 +362,14 @@ jobs:
       - run:
           name: Install node
           command: |
+            echo "Install node"
             apk add --update nodejs nodejs-npm
             node --version
             npm --version
       - run:
           name: Install ansible
           command: |
+            echo "install ansible"
             # your code here
             apk add --update ansible
             ansible --version
@@ -384,7 +387,9 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
+            echo "npm i"
             npm i
+            echo "print environment variables"
             echo ENVIRONMENT=production > ".env"
             echo TYPEORM_CONNECTION=postgres >> ".env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
