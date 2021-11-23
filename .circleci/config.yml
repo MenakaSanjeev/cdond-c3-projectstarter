@@ -298,9 +298,9 @@ jobs:
       - run:
           name: Install aws
           command: |                        
-            sudo apt-get install python python-pip
-            sudo pip install awscli
-            aws --version
+            #sudo apt-get install python python-pip
+            #sudo pip install awscli
+            #aws --version
       - run:
           name: Get backend url
           command: |
@@ -486,9 +486,28 @@ jobs:
           command: |
             # your code here            
             #pip install awscli
-            sudo apt update #apk add --update curl nodejs npm
-            sudo apt install -y awscli
-            sudo apt install -y python3 ansible
+             - attach_workspace:
+            at: ~/
+      - run:
+          name: Install dependencies
+          command: 
+            # Your code here
+            apk update
+            apk upgrade
+            apk add unzip 
+            apk add curl
+            /usr/local/bin/python -m pip install --upgrade pip    
+      - run:
+          name: Install node
+          command: |
+            apk add --update nodejs nodejs-npm
+            node --version
+            npm --version
+      - run:
+          name: Install aws
+          command: |    
+            pip install awscli --upgrade   
+            aws --version 
       - run:
           name: Backend smoke test.
           command: |
