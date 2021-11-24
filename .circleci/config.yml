@@ -402,22 +402,16 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             npm run build
-            cp package* ./dist
-            #npm run prestart:prod
+            npm run prestart:prod
             cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
-            #echo "Contents  of the inventory.txt file is -------"
-            #cat .circleci/ansible/inventory.txt
-            #echo "Cat inventory text file -------"
-            #tar -cvf backend.tar backend
-            #echo "tarbal -------"
-            #cp backend.tar ~/backend.tar
-            #echo "copy backend -------"
-            #ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml   
+            cat .circleci/ansible/inventory.txt
+            echo "Cat inventory text file -------"
+            tar -cvf backend.tar backend
+            echo "tarbal -------"
+            cp backend.tar ~/backend.tar
+            echo "copy backend -------"
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml   
       #- run:
       #    name: Install dependencies
       #    command: |
@@ -477,7 +471,7 @@ jobs:
   smoke-test:
     docker:
       # Lightweight Docker image 
-      - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0  #python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - checkout 
@@ -486,28 +480,9 @@ jobs:
           command: |
             # your code here            
             #pip install awscli
-             - attach_workspace:
-            at: ~/
-      - run:
-          name: Install dependencies
-          command: 
-            # Your code here
-            apk update
-            apk upgrade
-            apk add unzip 
-            apk add curl
-            /usr/local/bin/python -m pip install --upgrade pip    
-      - run:
-          name: Install node
-          command: |
-            apk add --update nodejs nodejs-npm
-            node --version
-            npm --version
-      - run:
-          name: Install aws
-          command: |    
-            pip install awscli --upgrade   
-            aws --version 
+            sudo apt update #apk add --update curl nodejs npm
+            sudo apt install -y awscli
+            sudo apt install -y python3 ansible
       - run:
           name: Backend smoke test.
           command: |
