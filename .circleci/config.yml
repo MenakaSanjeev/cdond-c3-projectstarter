@@ -266,6 +266,7 @@ jobs:
           working_directory: ./backend
           command: |
             npm install
+            echo "Running migrations"
             npm run migrations > migrations_dump.txt
       - run:
           name: Send migration results to memstash
@@ -655,16 +656,16 @@ workflows:
             branches:
               only:
                 - master
-      - deploy-frontend:
-          requires:
-            - run-migrations
-      - deploy-backend:
-          requires:
-            - run-migrations      
-      - smoke-test:
-          requires:
-            - deploy-backend
-            - deploy-frontend
+      #- deploy-frontend:
+      #    requires:
+      #      - run-migrations
+      #- deploy-backend:
+      #    requires:
+      #      - run-migrations      
+      #- smoke-test:
+      #    requires:
+      #      - deploy-backend
+      #      - deploy-frontend
 
   #send-notification:
   #  jobs:
